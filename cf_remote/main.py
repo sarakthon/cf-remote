@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import re
 
 from cf_remote import log
 from cf_remote import version
@@ -627,8 +628,10 @@ def resolve_hosts(string, single=False, bootstrap_ips=False):
             hosts = get_cloud_hosts(name, bootstrap_ips)
             ret.extend(hosts)
             log.debug("found in cloud, adding '{}'".format(hosts))
-        else:
+        elif name == "localhost" or re.search(r"[@:.]", name):
             ret.append(name)
+        else:
+            raise CFRUserError("'{}' does not exist.".format(name))
 
     if single:
         if len(ret) != 1:
